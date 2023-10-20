@@ -63,13 +63,38 @@ rm(x) # yes!
 min(hkmain$adat)  # "200701"
 max(hkmain$edat) # "201912"
 
-# How many complete observations for main variables? 
-hkmain_compl <- hkmain %>% select(plz, obid, adat, edat, kaufpreis, baujahr, 
+# Rename values of gid2019 to prepare for merge 
+city_names <- c("2000000" = "Hamburg" ,
+                '3241001' = "Hannover",
+                "4011000" = "Bremen", 
+                "5111000" = "Duesseldorf", 
+                "5112000" = "Duisburg", 
+                "5113000" = "Essen", 
+                "5315000" = "Köln", 
+                "5913000" = "Dortmund", 
+                "6412000" = "Frankfurt", 
+                "8111000" = "Stuttgart", 
+                "9162000" = "München", 
+                "9564000" = "Nürnberg", 
+                "11000000" = "Berlin", 
+                "14612000" = "Dresden", 
+                "14713000" = "Leipzig") 
+# Select variables of interest and recode gid2019 variable:  
+hkmain_crop <- hkmain %>% select(plz, obid, adat, edat, kaufpreis, baujahr, 
                        wohnflaeche, grundstuecksflaeche, zimmeranzahl, 
-                       heizungsart, objektzustand,kategorie_Haus) %>%
-  mutate(across(everything(), ~replace(., . %in% c("Other missing", "Not specified"), NA))) %>%
-  drop_na() 
-nrow(hkmain_compl) # 102550 complete observations for 15 cities 
+                       heizungsart, objektzustand,kategorie_Haus, gid2019) %>%
+  mutate(across(everything(), ~replace(., . %in% c("Other missing", "Not specified"), NA)), 
+         municipality = as.character(gid2019), 
+         municipality = recode(municipality, !!!city_names)) %>%
+  select(!gid2019) #%>% 
+  drop_na() # 102550 complete observations for 15 cities if drop_na() is included!
+       
+# Which variable has the most missing values (and could potentionally be dropped)? 
+# Counting missing values for each column
+missing_count <- sapply(hkmain_crop, function(x) sum(is.na(x)))
+# Sorting variables based on the number of missing values
+sorted_missing_count <- sort(missing_count, decreasing = TRUE)
+print(sorted_missing_count)
 
 
 
