@@ -24,16 +24,17 @@ hk <- read.csv(file = file.path(path, "CampusFile_HK_cities.csv")) # HausKauf
 
 # 3 prepare datasets -----------------------------------------------------------
 ## 3.1 hk dataset --------------------------------------------------------------
-hk <- hk %>% mutate(plz = as.double(plz)) # change plz column to double format
-hkmain <- hk # create dublicate, that we can apply filters on without "loosing" the original df
-hkmain<- hkmain %>% select(plz, obid, adat, edat, spell) 
+hkmain <- hk # create dublicate
+hkmain <- hkmain %>% mutate(plz = as.double(plz)) # change plz column to double format
 # Reconvert time span variables: edat and adat
 hkmain$adat <- stringr::str_replace(hkmain$adat, "m(?=\\d$)", "0") # converts 2007m1 to 200701
 hkmain$adat <- stringr::str_replace(hkmain$adat, "m", "") # converts 2007m10 to 200710
 hkmain$edat <- stringr::str_replace(hkmain$edat, "m(?=\\d$)", "0") # converts 2007m1 to 200701
 hkmain$edat <- stringr::str_replace(hkmain$edat, "m", "") # converts 2007m10 to 200710
+df_in <- hkmain
+hkmain<- hkmain %>% select(plz, obid, adat, edat, spell) 
 # Apply first filters to hkmain: 
-hkmain <- hkmain %>% 
+x <- hkmain %>% 
   distinct() %>% # (1) delete identical rows 
   drop_na(plz, obid) %>% # (2) drop objects without id or plz
   filter(edat <=201912) %>% # (3) restrict time period to 200701 to 201912
@@ -43,7 +44,7 @@ hkmain <- hkmain %>%
    # the last time span
    # the highest spell counter within one object id 
    # Furthermore drop all obid for which are more than pone plz are listed, e.g. obid 36682266
-  ungroup() %>% left_join(hk) # merge rest of hk variables back onto our filtered hk version, hkmain 
+  ungroup() %>% left_join(df_in, by = c("plz", "obid", "adat", "edat", "spell")) # merge rest of hk variables back onto our filtered hk version, hkmain 
 
 # Check: 
 # Is every obid listed only once in hkmain? 
