@@ -34,7 +34,7 @@ hkmain$edat <- stringr::str_replace(hkmain$edat, "m", "") # converts 2007m10 to 
 df_in <- hkmain
 hkmain<- hkmain %>% select(plz, obid, adat, edat, spell) 
 # Apply first filters to hkmain: 
-x <- hkmain %>% 
+hkmain <- hkmain %>% 
   distinct() %>% # (1) delete identical rows 
   drop_na(plz, obid) %>% # (2) drop objects without id or plz
   filter(edat <=201912) %>% # (3) restrict time period to 200701 to 201912
