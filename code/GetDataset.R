@@ -63,5 +63,13 @@ rm(x) # yes!
 min(hkmain$adat)  # "200701"
 max(hkmain$edat) # "201912"
 
+# How many complete observations for main variables? 
+hkmain_compl <- hkmain %>% select(plz, obid, adat, edat, kaufpreis, baujahr, 
+                       wohnflaeche, grundstuecksflaeche, zimmeranzahl, 
+                       heizungsart, objektzustand,kategorie_Haus) %>%
+  mutate(across(everything(), ~replace(., . %in% c("Other missing", "Not specified"), NA))) %>%
+  drop_na() 
+nrow(hkmain_compl) # 102550 complete observations for 15 cities 
+
 
 
