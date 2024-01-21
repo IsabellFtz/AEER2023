@@ -5,4 +5,4 @@ This repository contains the accompanying code to our assignemnt to the course A
 
 
 by 
-Edgar, Isabell and Maria
+Isabell
